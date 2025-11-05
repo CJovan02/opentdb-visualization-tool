@@ -4,12 +4,19 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useTriviaData} from "../../hooks/useTriviaData.tsx";
 import CategorySelector from "../components/CategorySelector.tsx";
-import {Bar, BarChart} from "recharts";
+import TriviaVisualization from "../components/TriviaVisualization.tsx";
 
 function MainPage() {
-    const {categories, categoriesLoading, selectedCategory, selectCategory, triviaDist} = useTriviaData();
+    const {
+        categories,
+        categoriesLoading,
+        selectedCategory,
+        selectCategory,
+        distributionsLoading,
+        getNewTriviaDistributions,
+        triviaDist
+    } = useTriviaData();
 
-    console.log(triviaDist);
     if (categoriesLoading) {
         return (
             <Container>
@@ -19,12 +26,22 @@ function MainPage() {
     }
 
     return (
-        <Box sx={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-            <CategorySelector
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onSelectCategory={selectCategory}
-            />
+        <Box sx={{width: '100%', minHeight: '90vh'}}>
+            <Container maxWidth='lg' sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+            }}>
+                <TriviaVisualization triviaDist={triviaDist} distributionsLoading={distributionsLoading}
+                                     getNewTriviaDistributions={getNewTriviaDistributions}/>
+
+                <CategorySelector
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={selectCategory}
+                />
+            </Container>
+
         </Box>
     );
 }

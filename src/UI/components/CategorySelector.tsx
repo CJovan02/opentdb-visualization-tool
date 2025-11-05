@@ -20,7 +20,7 @@ function CategorySelector(
     }
 
     return (
-        <FormControl fullWidth>
+        <FormControl margin="normal">
             <InputLabel id="category-select-label">Category</InputLabel>
             <Select
                 id="category-select"
@@ -28,9 +28,9 @@ function CategorySelector(
                 label="Category"
                 value={selectedCategory?.id ?? ''}
                 onChange={handleChange}
-                //autoWidth={true}
+                //autoWidth={false}
                 sx={{
-                    minWidth: '3rem',
+                    minWidth: '5rem',
                 }}
             >
                 {categories.map(cat => (

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {getTriviaCategories, getTriviaDistributions} from "../repository/triviaRepository.ts";
 import type {Category} from "../models/category.ts";
 import type {TriviaDistribution} from "../models/triviaDistribution.ts";
@@ -9,6 +9,7 @@ export function useTriviaData() {
     const [categoriesLoading, setCategoriesLoading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [distributionsLoading, setDistributionsLoading] = useState(false);
     const [triviaDist, setTriviaDist] = useState<TriviaDistribution | undefined>();
 
     const fetchCategories = async () => {
@@ -23,10 +24,12 @@ export function useTriviaData() {
         setCategoriesLoading(false);
     };
 
-    async function fetchDist() {
+    const getNewTriviaDistributions = useCallback(async () => {
+        setDistributionsLoading(true);
         const dist = await getTriviaDistributions();
         setTriviaDist(dist);
-    }
+        setDistributionsLoading(false);
+    }, [])
 
     useEffect(() => {
         fetchCategories();
@@ -47,6 +50,8 @@ export function useTriviaData() {
         categories,
         selectedCategory,
         selectCategory,
+        distributionsLoading,
         triviaDist,
+        getNewTriviaDistributions
     };
 }
