@@ -1,25 +1,34 @@
 import {useEffect, useState} from "react";
-import {getTriviaCategories} from "../repository/triviaRepository.ts";
+import {getTriviaCategories, getTriviaDistributions} from "../repository/triviaRepository.ts";
 import type {Category} from "../models/category.ts";
+import type {TriviaDistribution} from "../models/triviaDistribution.ts";
+
+// TODO error handling
 
 export function useTriviaData() {
     const [categoriesLoading, setCategoriesLoading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [triviaDist, setTriviaDist] = useState<TriviaDistribution | undefined>();
+
+    const fetchCategories = async () => {
+        setCategoriesLoading(true);
+
+        const cats = await getTriviaCategories();
+        setCategories(cats);
+
+        // we select the first category when they are loaded
+        setSelectedCategory(cats[0]);
+
+        setCategoriesLoading(false);
+    };
+
+    async function fetchDist() {
+        const dist = await getTriviaDistributions();
+        setTriviaDist(dist);
+    }
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            setCategoriesLoading(true);
-
-            const cats = await getTriviaCategories();
-            setCategories(cats);
-
-            // we select the first category when they are loaded
-            setSelectedCategory(cats[0]);
-
-            setCategoriesLoading(false);
-        };
-
         fetchCategories();
     }, [])
 
@@ -33,5 +42,11 @@ export function useTriviaData() {
         }
     }
 
-    return {categoriesLoading, categories, selectedCategory, selectCategory};
+    return {
+        categoriesLoading,
+        categories,
+        selectedCategory,
+        selectCategory,
+        triviaDist,
+    };
 }

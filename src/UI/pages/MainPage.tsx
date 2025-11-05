@@ -4,10 +4,12 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useTriviaData} from "../../hooks/useTriviaData.tsx";
 import CategorySelector from "../components/CategorySelector.tsx";
+import {Bar, BarChart} from "recharts";
 
 function MainPage() {
-    const {categories, categoriesLoading, selectedCategory, selectCategory} = useTriviaData();
+    const {categories, categoriesLoading, selectedCategory, selectCategory, triviaDist} = useTriviaData();
 
+    console.log(triviaDist);
     if (categoriesLoading) {
         return (
             <Container>
@@ -21,7 +23,8 @@ function MainPage() {
             <CategorySelector
                 categories={categories}
                 selectedCategory={selectedCategory}
-                onSelectCategory={selectCategory}/>
+                onSelectCategory={selectCategory}
+            />
         </Box>
     );
 }

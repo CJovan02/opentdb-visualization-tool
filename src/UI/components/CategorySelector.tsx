@@ -28,9 +28,9 @@ function CategorySelector(
                 label="Category"
                 value={selectedCategory?.id ?? ''}
                 onChange={handleChange}
-                //autoWidth={false}
+                //autoWidth={true}
                 sx={{
-                    minWidth: '5rem',
+                    minWidth: '3rem',
                 }}
             >
                 {categories.map(cat => (
