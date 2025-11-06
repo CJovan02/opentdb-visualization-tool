@@ -30,7 +30,7 @@ function CategoryVisualizer({
             sx={{
                 height: "100%",
                 width: "100%",
-                paddingInline: '1rem',
+                paddingInline: '1rem 2rem',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',

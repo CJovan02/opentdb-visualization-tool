@@ -1,7 +1,7 @@
 import {createTheme} from '@mui/material/styles';
 import type {ThemeOptions} from '@mui/material/styles';
 import {indigo} from '@mui/material/colors';
-import {alpha} from '@mui/material/styles';
+import {lighten} from '@mui/material/styles';
 
 const primaryColor = indigo[500];
 
@@ -11,7 +11,8 @@ export const brandedTokens: ThemeOptions = {
             main: primaryColor,
         },
         background: {
-            default: alpha(primaryColor, 0.05),
+            default: lighten(primaryColor, 0.97),
+            paper: lighten(primaryColor, 0.91),
         }
     },
     shape: {

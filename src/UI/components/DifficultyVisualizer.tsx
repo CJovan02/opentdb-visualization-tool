@@ -23,6 +23,7 @@ function DifficultyVisualizer({difficultyDistribution}: DifficultyVisualizerProp
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                padding: "0.5rem 2rem",
             }}
         >
             <Typography variant='h6' mb='1rem' sx={{fontWeight: 'bold'}}>Difficulty Distribution</Typography>
