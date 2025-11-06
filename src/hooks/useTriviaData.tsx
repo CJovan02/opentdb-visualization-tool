@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from "react";
 import {
     getTriviaCategories,
-    getTriviaDistributions,
+    getTriviaStatistics,
     groupQuestionsDistribution
 } from "../repository/triviaRepository.ts";
 import type {Category} from "../models/category.ts";
@@ -12,7 +12,7 @@ export type TriviaStatus = "initial" | "loading" | "loaded" | "error";
 
 const anyCategory = {
     id: -1,
-        name: "Any Category",
+    name: "Any Category",
 }
 
 export function useTriviaData() {
@@ -41,7 +41,7 @@ export function useTriviaData() {
 
 
     useEffect(() => {
-        const initialFetch = async () => {
+        const initialCategoryFetch = async () => {
             setTriviaStatus("loading");
 
             const result = await getTriviaCategories();
@@ -51,20 +51,22 @@ export function useTriviaData() {
                 return;
             }
             const cats = result.value;
+
             setCategories([anyCategory, ...cats]);
 
             setTriviaStatus("loaded");
         };
 
-        initialFetch();
+        initialCategoryFetch();
+        getNewTriviaStatistics()
     }, [])
 
-    const getNewTriviaDistributions = useCallback(async () => {
-        if(triviaStatus === 'error') setTriviaStatus("loading");
+    const getNewTriviaStatistics = useCallback(async () => {
+        if (triviaStatus === 'error') setTriviaStatus("loading");
 
         setStatisticsLoading(true);
 
-        const result = await getTriviaDistributions();
+        const result = await getTriviaStatistics();
         if (result.isErr) {
             setTriviaStatus("error");
             setError(result.error)
@@ -116,7 +118,7 @@ export function useTriviaData() {
         selectCategory,
         statisticsLoading,
         triviaStatistics,
-        getNewTriviaDistributions,
+        getNewTriviaStatistics,
         selectLocalCategory,
         localCategorySelected,
         error,

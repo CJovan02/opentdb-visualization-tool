@@ -14,7 +14,7 @@ function MainPage() {
         selectedCategory,
         selectCategory,
         statisticsLoading,
-        getNewTriviaDistributions,
+        getNewTriviaStatistics,
         triviaStatistics,
         selectLocalCategory,
         localCategorySelected,
@@ -24,7 +24,7 @@ function MainPage() {
     if (triviaStatus === 'error') {
         return (
             <Container>
-                <ErrorDisplay message={error?.message} title="Error occurred" onRetry={getNewTriviaDistributions}/>
+                <ErrorDisplay message={error?.message} title="Error occurred" onRetry={getNewTriviaStatistics}/>
             </Container>
         )
     }
@@ -47,7 +47,7 @@ function MainPage() {
                 <TriviaVisualization localCategorySelected={localCategorySelected}
                                      selectLocalCategory={selectLocalCategory} triviaStatistics={triviaStatistics}
                                      distributionsLoading={statisticsLoading}
-                                     getNewTriviaDistributions={getNewTriviaDistributions}/>
+                                     getNewTriviaDistributions={getNewTriviaStatistics}/>
 
                 <CategorySelector
                     categories={categories}

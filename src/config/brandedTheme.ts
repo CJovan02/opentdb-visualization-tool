@@ -19,16 +19,10 @@ export const brandedTokens: ThemeOptions = {
 
 export const brandedComponents: ThemeOptions['components'] = {
     MuiButton: {
-        defaultProps: {
-            disableElevation: true,
-        },
         styleOverrides: {
             root: {
-                minWidth: 'unset',
+                //minWidth: 'unset',
                 textTransform: 'capitalize',
-                '&:hover': {
-                    textDecoration: 'underline',
-                },
             },
         },
     },
