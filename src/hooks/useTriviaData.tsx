@@ -2,11 +2,12 @@ import {useCallback, useEffect, useState} from "react";
 import {
     getTriviaCategories,
     getTriviaStatistics,
-    groupQuestionsDistribution
+    groupQuestionsDistribution, questionsCacheKey
 } from "../repository/triviaRepository.ts";
 import type {Category} from "../models/category.ts";
 import type {TriviaStatistics} from "../models/triviaStatistics.ts";
 import type {Question} from "../models/question.ts";
+import {TriviaApiError} from "../api/triviaApiError.ts";
 
 export type TriviaStatus = "initial" | "loading" | "loaded" | "error";
 
@@ -39,6 +40,8 @@ export function useTriviaData() {
     // Error that was thrown and caught, we should set the flat to 'error' when we want to change this value
     const [error, setError] = useState<null | Error>(null);
 
+    const [snackbarMessage, setSnackbarMessage] = useState<string | null>();
+
 
     useEffect(() => {
         const initialCategoryFetch = async () => {
@@ -61,15 +64,41 @@ export function useTriviaData() {
         getNewTriviaStatistics()
     }, [])
 
-    const getNewTriviaStatistics = useCallback(async () => {
+    const getNewTriviaStatistics = useCallback(async (categoryId?: number) => {
         if (triviaStatus === 'error') setTriviaStatus("loading");
 
         setStatisticsLoading(true);
 
-        const result = await getTriviaStatistics();
+        const result = await getTriviaStatistics(categoryId);
         if (result.isErr) {
-            setTriviaStatus("error");
-            setError(result.error)
+            if (!(result.error instanceof TriviaApiError && result.error.status === 5)) {
+                setTriviaStatus("error");
+                setError(result.error)
+                return;
+            }
+
+            // If we get status 5 error, it means that we didn't find selected category in cache
+            // Then we will load the "any-category" cache and inform the user
+            const cached = localStorage.getItem(questionsCacheKey());
+            if (!cached) {
+                setTriviaStatus("error");
+                setError(result.error)
+                return;
+            }
+            const questions = JSON.parse(cached);
+            const [byCategory, byDifficulty] = groupQuestionsDistribution(questions);
+            const statistics: TriviaStatistics = {
+                questions: questions,
+                distribution: {
+                    byCategory,
+                    byDifficulty,
+                }
+            }
+            setTriviaStatistics(statistics);
+            setTriviaStatus("loaded");
+            setSelectedCategory(anyCategory);
+            setSnackbarMessage("Too many requests. Showing cached data from 'Any Category'. Please wait a few seconds before selecting another category.");
+            setStatisticsLoading(false);
             return;
         }
 
@@ -77,8 +106,10 @@ export function useTriviaData() {
 
         setTriviaStatistics(dist);
         setTriviaStatus("loaded");
+        if (!categoryId)
+            setSelectedCategory(anyCategory);
         setStatisticsLoading(false);
-    }, [triviaStatus])
+    }, [triviaStatus]);
 
     const selectLocalCategory = useCallback((category: string) => {
         if (triviaStatistics === undefined) return;
@@ -106,10 +137,12 @@ export function useTriviaData() {
     }, [triviaStatistics, localCategorySelected]);
 
 
-    function selectCategory(categoryId: number) {
+    const selectCategory = useCallback(async (categoryId: number) => {
         const category = categories.find(cat => cat.id === categoryId) ?? anyCategory;
         setSelectedCategory(category);
-    }
+
+        await getNewTriviaStatistics(category.id);
+    }, [categories, getNewTriviaStatistics])
 
     return {
         triviaStatus,
@@ -121,6 +154,8 @@ export function useTriviaData() {
         getNewTriviaStatistics,
         selectLocalCategory,
         localCategorySelected,
+        snackbarMessage,
+        setSnackbarMessage,
         error,
     };
 }

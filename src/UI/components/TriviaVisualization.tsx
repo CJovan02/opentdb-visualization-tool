@@ -30,7 +30,8 @@ function TriviaVisualization({
                 alignItems="center"
                 sx={{width: '100%'}}
             >
-                <Button variant="contained" onClick={getNewTriviaDistributions} loading={distributionsLoading}>Reload
+                <Button variant="contained" onClick={() => getNewTriviaDistributions()}
+                        loading={distributionsLoading}>Reload
                     new
                     data</Button>
                 {/*{distributionsLoading && <CircularProgress/>}*/}

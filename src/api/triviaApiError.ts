@@ -27,3 +27,23 @@ export function extractTriviaErrorIfPresent(error: unknown): TriviaApiError {
 
     throw error;
 }
+
+export function getTriviaErrorMessage(code: number): string {
+    switch (code) {
+        case 0:
+            return "Success: The request returned results successfully.";
+        case 1:
+            return "No results: The API doesn't have enough questions for your query.";
+        case 2:
+            return "Invalid parameter: One or more parameters are not valid.";
+        case 3:
+            return "Token not found: Your session token does not exist.";
+        case 4:
+            return "Token empty: All possible questions for this query have been returned. You need to reset your token.";
+        case 5:
+            return "Rate limit reached: Too many requests. Please wait a few seconds before trying again.";
+        default:
+            return "Unknown error: An unexpected error occurred.";
+    }
+}
+

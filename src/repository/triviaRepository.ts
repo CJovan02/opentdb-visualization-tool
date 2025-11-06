@@ -6,14 +6,20 @@ import {Err, Ok, type Result} from "../utils/result.ts";
 import {TriviaApiError} from "../api/triviaApiError.ts";
 import {capitalize} from "@mui/material";
 
-const questionsCacheKey = "trivia-questions";
+// Since we send different requests to the server for each category, we must cache each of the categories
+export function questionsCacheKey(categoryId?: number) {
+    if (categoryId) {
+        return `trivia-questions-${categoryId}`;
+    }
+    return `trivia-questions-any`;
+}
 
 export async function getTriviaCategories(): Promise<Result<Category[]>> {
     return await fetchCategories();
 }
 
-export async function getTriviaStatistics(): Promise<Result<TriviaStatistics>> {
-    const result = await fetchQuestions();
+export async function getTriviaStatistics(categoryId?: number): Promise<Result<TriviaStatistics>> {
+    const result = await fetchQuestions(categoryId);
 
     // We check if it's trivia api error with the code 5, which means we sent too many requests
     // Then we need to try and load the data from some sort of cache
@@ -24,10 +30,11 @@ export async function getTriviaStatistics(): Promise<Result<TriviaStatistics>> {
 
         // Load previous questions from cache
         console.log("Too many requests. Loading previous result from cache...");
-        const cached = localStorage.getItem(questionsCacheKey);
+        const cached = localStorage.getItem(questionsCacheKey(categoryId));
         if (!cached) {
             console.log("Could not get questions from cache");
-            // If there is nothing in cache, we will just show the error
+            // If there is nothing in cache, it means that we are asking for a category that is not cached
+            // Then we will just return the error
             return Err.of(result.error);
         }
 
@@ -45,7 +52,7 @@ export async function getTriviaStatistics(): Promise<Result<TriviaStatistics>> {
     const questions = result.value;
 
     // we cache the result in local storage
-    localStorage.setItem(questionsCacheKey, JSON.stringify(questions));
+    localStorage.setItem(questionsCacheKey(categoryId), JSON.stringify(questions));
 
     const [categoryDist, difficultyDist] = groupQuestionsDistribution(questions);
 
