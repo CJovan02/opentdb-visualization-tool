@@ -8,6 +8,7 @@ import DifficultyVisualizer from "./DifficultyVisualizer.tsx";
 import CategorySelector from "./CategorySelector.tsx";
 import type {Category} from "../../models/category.ts";
 import Refresh from "@mui/icons-material/Refresh";
+import QuestionsTable from "./QuestionsTable.tsx";
 
 type TriviaVisualizationProps = {
     triviaStatistics: TriviaStatistics | undefined;
@@ -50,22 +51,27 @@ function TriviaVisualization({
                 </Stack>
                 {/*{distributionsLoading && <CircularProgress/>}*/}
                 {!distributionsLoading && triviaStatistics && (
-                    <Stack
-                        direction={{sm: 'column', md: 'row'}}
-                        //spacing={2}
-                        gap={2}
-                        sx={{width: '100%'}}
-                    >
-                        <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                            <CategoryVisualizer categoryDistribution={triviaStatistics.distribution.byCategory}
-                                                selectLocalCategory={selectLocalCategory}
-                                                localCategorySelected={localCategorySelected}/>
-                        </Box>
-                        <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                            <DifficultyVisualizer difficultyDistribution={triviaStatistics.distribution.byDifficulty}
-                            />
-                        </Box>
-                    </Stack>
+                    <>
+                        <Stack
+                            direction={{sm: 'column', md: 'row'}}
+                            //spacing={2}
+                            gap={2}
+                            sx={{width: '100%'}}
+                        >
+                            <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+                                <CategoryVisualizer categoryDistribution={triviaStatistics.distribution.byCategory}
+                                                    selectLocalCategory={selectLocalCategory}
+                                                    localCategorySelected={localCategorySelected}/>
+                            </Box>
+                            <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+                                <DifficultyVisualizer difficultyDistribution={triviaStatistics.distribution.byDifficulty}
+                                />
+                            </Box>
+                        </Stack>
+
+                        <QuestionsTable questions={triviaStatistics?.questions ?? []} />
+
+                    </>
                 )}
             </Stack>
         </Container>

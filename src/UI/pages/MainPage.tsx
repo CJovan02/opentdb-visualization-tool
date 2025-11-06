@@ -63,7 +63,6 @@ function MainPage() {
                                              distributionsLoading={statisticsLoading}
                                              getNewTriviaDistributions={getNewTriviaStatistics}/>
 
-
                         <Typography mt='5rem'>
                             Data Source: <Link href="https://opentdb.com/">Open Trivia DB</Link>
                         </Typography>

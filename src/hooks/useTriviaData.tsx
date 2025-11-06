@@ -46,6 +46,7 @@ export function useTriviaData() {
 
 
     useEffect(() => {
+        // Fetches all categories
         const initialCategoryFetch = async () => {
             setTriviaStatus("loading");
 
@@ -62,10 +63,13 @@ export function useTriviaData() {
             setTriviaStatus("loaded");
         };
 
+        // On first load, we get all categories, and we load the data for the graphs
         initialCategoryFetch();
         getNewTriviaStatistics()
     }, [])
 
+    // Calls the api for new questions. It also accepts categoryId parameter in order to get 50 questions
+    // for that category. If it's null, it means 'any category' is selected
     const getNewTriviaStatistics = useCallback(async (categoryId?: number) => {
         if (triviaStatus === 'error') setTriviaStatus("loading");
 
@@ -118,6 +122,9 @@ export function useTriviaData() {
         setStatisticsLoading(false);
     }, [triviaStatus]);
 
+
+    // Used as local filter, it selects the category from the graph and groups the data for the graphs
+    // while only using the questions with the selected category
     const selectLocalCategory = useCallback((category: string) => {
         if (triviaStatistics === undefined) return;
 
@@ -144,6 +151,8 @@ export function useTriviaData() {
     }, [triviaStatistics, localCategorySelected]);
 
 
+    // It's used to select the category from the drop-down menu, and it also calls the function
+    // to fetch new questions with that category
     const selectCategory = useCallback(async (categoryId: number) => {
         const category = categories.find(cat => cat.id === categoryId) ?? anyCategory;
         setSelectedCategory(category);

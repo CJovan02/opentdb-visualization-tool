@@ -63,6 +63,8 @@ export async function getTriviaStatistics(categoryId?: number): Promise<Result<T
     } as TriviaStatistics);
 }
 
+// The questions you give it will be grouped in an array of objects. Those objects are then ready to be accepted by the
+// Recharts library.
 export function groupQuestionsDistribution(questions: Question[]): [CategoryDistribution[], DifficultyDistribution[]] {
     // We use record/map for quick lookup O(1) when counting questions for each category or difficulty
     const categoriesMap: Record<string, number> = {};

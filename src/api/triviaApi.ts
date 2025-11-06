@@ -24,6 +24,7 @@ export async function fetchCategories(): Promise<Result<Category[]>> {
     }
 }
 
+// Pass in category in order to filter by it, if it's null it means 'any category'
 export async function fetchQuestions(categoryId?: number): Promise<Result<Question[]>> {
     try {
         let requestUrl = "https://opentdb.com/api.php?amount=50"
