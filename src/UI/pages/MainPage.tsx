@@ -5,21 +5,31 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {useTriviaData} from "../../hooks/useTriviaData.tsx";
 import CategorySelector from "../components/CategorySelector.tsx";
 import TriviaVisualization from "../components/TriviaVisualization.tsx";
+import {ErrorDisplay} from "../components/ErrorDisplay.tsx";
 
 function MainPage() {
     const {
+        triviaStatus,
         categories,
-        categoriesLoading,
         selectedCategory,
         selectCategory,
-        distributionsLoading,
+        statisticsLoading,
         getNewTriviaDistributions,
         triviaStatistics,
         selectLocalCategory,
         localCategorySelected,
+        error
     } = useTriviaData();
 
-    if (categoriesLoading) {
+    if (triviaStatus === 'error') {
+        return (
+            <Container>
+                <ErrorDisplay message={error?.message} title="Error occurred" onRetry={getNewTriviaDistributions}/>
+            </Container>
+        )
+    }
+
+    if (triviaStatus === 'loading' || triviaStatus === 'initial') {
         return (
             <Container>
                 <CircularProgress/>
@@ -36,7 +46,7 @@ function MainPage() {
             }}>
                 <TriviaVisualization localCategorySelected={localCategorySelected}
                                      selectLocalCategory={selectLocalCategory} triviaStatistics={triviaStatistics}
-                                     distributionsLoading={distributionsLoading}
+                                     distributionsLoading={statisticsLoading}
                                      getNewTriviaDistributions={getNewTriviaDistributions}/>
 
                 <CategorySelector

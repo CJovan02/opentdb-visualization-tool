@@ -2,23 +2,34 @@ import type {Category} from "../models/category.ts";
 import {fetchCategories, fetchQuestions} from "../api/triviaApi.ts";
 import type {CategoryDistribution, DifficultyDistribution, TriviaStatistics} from "../models/triviaStatistics.ts";
 import type {Question} from "../models/question.ts";
+import {Err, Ok, type Result} from "../utils/result.ts";
+import {TriviaApiError} from "../api/triviaApiError.ts";
 
-// TODO error handling
-
-export async function getTriviaCategories(): Promise<Category[]> {
+export async function getTriviaCategories(): Promise<Result<Category[]>> {
     return await fetchCategories();
 }
 
-export async function getTriviaDistributions(): Promise<TriviaStatistics> {
-    const questions = await fetchQuestions();
+export async function getTriviaDistributions(): Promise<Result<TriviaStatistics>> {
+    const result = await fetchQuestions();
+
+    // We check if it's trivia api error with the code 5, which means we sent too many requests
+    // Then we need to try and load the data from some sort of cache
+    if (result.isErr) {
+        if (result.error instanceof TriviaApiError && result.error.status === 5) {
+            // Load previous questions from cache
+        }
+
+        return Err.of(result.error);
+    }
+    const questions = result.value;
 
     const [categoryDist, difficultyDist] = groupQuestionsDistribution(questions);
 
-    return {
+    return Ok.of({
         questions, distribution: {
             byCategory: categoryDist, byDifficulty: difficultyDist
         }
-    } as TriviaStatistics;
+    } as TriviaStatistics);
 }
 
 export function groupQuestionsDistribution(questions: Question[]): [CategoryDistribution[], DifficultyDistribution[]] {

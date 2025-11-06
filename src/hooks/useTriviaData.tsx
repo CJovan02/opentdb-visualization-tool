@@ -8,38 +8,75 @@ import type {Category} from "../models/category.ts";
 import type {TriviaStatistics} from "../models/triviaStatistics.ts";
 import type {Question} from "../models/question.ts";
 
-// TODO error handling
+export type TriviaStatus = "initial" | "loading" | "loaded" | "error";
+
+const anyCategory = {
+    id: -1,
+        name: "Any Category",
+}
 
 export function useTriviaData() {
-    const [categoriesLoading, setCategoriesLoading] = useState(false);
+
+    // Status for this view-model, loading is only used when the page first opens up and the
+    // Trivia categories and statistics need to be loaded
+    const [triviaStatus, setTriviaStatus] = useState<TriviaStatus>("initial");
+
+    // Trivia categories
     const [categories, setCategories] = useState<Category[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-    const [distributionsLoading, setDistributionsLoading] = useState(false);
+
+    // Selected category from the drop-down list
+    const [selectedCategory, setSelectedCategory] = useState<Category>(anyCategory);
+
+    // Flag to indicate statistics loading, it will only be true when you manually fetch new trivia data
+    const [statisticsLoading, setStatisticsLoading] = useState(false);
+
+    // Statistics, includes all questions fetched as well as calculated distributions
     const [triviaStatistics, setTriviaStatistics] = useState<TriviaStatistics | undefined>();
+
+    // Flag to indicate if the local category is selected, when you click the bar on the bar chart
     const [localCategorySelected, setLocalCategorySelected] = useState<boolean>(false);
 
-    const fetchCategories = async () => {
-        setCategoriesLoading(true);
+    // Error that was thrown and caught, we should set the flat to 'error' when we want to change this value
+    const [error, setError] = useState<null | Error>(null);
 
-        const cats = await getTriviaCategories();
-        setCategories(cats);
-
-        // we select the first category when they are loaded
-        setSelectedCategory(cats[0]);
-
-        setCategoriesLoading(false);
-    };
-
-    const getNewTriviaDistributions = useCallback(async () => {
-        setDistributionsLoading(true);
-        const dist = await getTriviaDistributions();
-        setTriviaStatistics(dist);
-        setDistributionsLoading(false);
-    }, [])
 
     useEffect(() => {
-        fetchCategories();
+        const initialFetch = async () => {
+            setTriviaStatus("loading");
+
+            const result = await getTriviaCategories();
+            if (result.isErr) {
+                setError(result.error);
+                setTriviaStatus("error");
+                return;
+            }
+            const cats = result.value;
+            setCategories([anyCategory, ...cats]);
+
+            setTriviaStatus("loaded");
+        };
+
+        initialFetch();
     }, [])
+
+    const getNewTriviaDistributions = useCallback(async () => {
+        if(triviaStatus === 'error') setTriviaStatus("loading");
+
+        setStatisticsLoading(true);
+
+        const result = await getTriviaDistributions();
+        if (result.isErr) {
+            setTriviaStatus("error");
+            setError(result.error)
+            return;
+        }
+
+        const dist = result.value;
+
+        setTriviaStatistics(dist);
+        setTriviaStatus("loaded");
+        setStatisticsLoading(false);
+    }, [triviaStatus])
 
     const selectLocalCategory = useCallback((category: string) => {
         if (triviaStatistics === undefined) return;
@@ -68,23 +105,20 @@ export function useTriviaData() {
 
 
     function selectCategory(categoryId: number) {
-        if (selectedCategory?.id === categoryId) {
-            setSelectedCategory(null);
-        } else {
-            const category = categories.find(cat => cat.id === categoryId) ?? null;
-            setSelectedCategory(category);
-        }
+        const category = categories.find(cat => cat.id === categoryId) ?? anyCategory;
+        setSelectedCategory(category);
     }
 
     return {
-        categoriesLoading,
+        triviaStatus,
         categories,
         selectedCategory,
         selectCategory,
-        distributionsLoading,
+        statisticsLoading,
         triviaStatistics,
         getNewTriviaDistributions,
         selectLocalCategory,
         localCategorySelected,
+        error,
     };
 }
