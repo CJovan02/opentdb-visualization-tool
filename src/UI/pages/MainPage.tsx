@@ -3,11 +3,13 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useTriviaData} from "../../hooks/useTriviaData.tsx";
-import CategorySelector from "../components/CategorySelector.tsx";
 import TriviaVisualization from "../components/TriviaVisualization.tsx";
 import {ErrorDisplay} from "../components/ErrorDisplay.tsx";
 import {getErrorMessage} from "../../utils/utils.ts";
 import Snackbar from "@mui/material/Snackbar"
+import MyAppBar from "../components/MyAppBar.tsx";
+import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
 
 function MainPage() {
     const {
@@ -44,7 +46,7 @@ function MainPage() {
     }
 
     return (
-        <Box sx={{width: '100%', minHeight: '90vh'}}>
+        <Box sx={{width: '100%', minHeight: '92vh'}}>
             <Snackbar
                 open={!!snackbarMessage}
                 message={snackbarMessage}
@@ -56,19 +58,20 @@ function MainPage() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                padding: '0',
             }}>
-                <TriviaVisualization localCategorySelected={localCategorySelected}
+                <MyAppBar/>
+                <TriviaVisualization categories={categories} selectedCategory={selectedCategory}
+                                     selectCategory={selectCategory} localCategorySelected={localCategorySelected}
                                      selectLocalCategory={selectLocalCategory} triviaStatistics={triviaStatistics}
                                      distributionsLoading={statisticsLoading}
                                      getNewTriviaDistributions={getNewTriviaStatistics}/>
 
-                <CategorySelector
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={selectCategory}
-                />
-            </Container>
 
+                <Typography mt='5rem'>
+                    Data Source: <Link href="https://opentdb.com/">Open Trivia DB</Link>
+                </Typography>
+            </Container>
         </Box>
     );
 }

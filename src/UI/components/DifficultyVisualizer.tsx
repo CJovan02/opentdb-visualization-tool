@@ -19,13 +19,17 @@ function DifficultyVisualizer({difficultyDistribution}: DifficultyVisualizerProp
             sx={{
                 height: "100%",
                 width: "100%",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
             }}
         >
             <Typography variant='h6' mb='1rem' sx={{fontWeight: 'bold'}}>Difficulty Distribution</Typography>
 
             <PieChart
                 responsive
-                style={{width: '100%', maxWidth: '800px', maxHeight: '350px', aspectRatio: 1}}
+                style={{width: '100%', maxWidth: '300px', maxHeight: '300px', aspectRatio: 1}}
             >
                 <Pie
                     data={difficultyDistribution}

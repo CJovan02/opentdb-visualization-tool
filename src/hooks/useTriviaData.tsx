@@ -35,7 +35,9 @@ export function useTriviaData() {
     const [triviaStatistics, setTriviaStatistics] = useState<TriviaStatistics | undefined>();
 
     // Flag to indicate if the local category is selected, when you click the bar on the bar chart
-    const [localCategorySelected, setLocalCategorySelected] = useState<boolean>(false);
+    // When the value is null it means that the user selected a category from the drop-down
+    // Meaning local selected is disabled
+    const [localCategorySelected, setLocalCategorySelected] = useState<boolean | null>(false);
 
     // Error that was thrown and caught, we should set the flat to 'error' when we want to change this value
     const [error, setError] = useState<null | Error>(null);
@@ -97,6 +99,7 @@ export function useTriviaData() {
             setTriviaStatistics(statistics);
             setTriviaStatus("loaded");
             setSelectedCategory(anyCategory);
+            setLocalCategorySelected(false);
             setSnackbarMessage("Too many requests. Showing cached data from 'Any Category'. Please wait a few seconds before selecting another category.");
             setStatisticsLoading(false);
             return;
@@ -106,8 +109,12 @@ export function useTriviaData() {
 
         setTriviaStatistics(dist);
         setTriviaStatus("loaded");
-        if (!categoryId)
+        if (!categoryId) {
             setSelectedCategory(anyCategory);
+            setLocalCategorySelected(false);
+        } else {
+            setLocalCategorySelected(null);
+        }
         setStatisticsLoading(false);
     }, [triviaStatus]);
 
@@ -141,7 +148,8 @@ export function useTriviaData() {
         const category = categories.find(cat => cat.id === categoryId) ?? anyCategory;
         setSelectedCategory(category);
 
-        await getNewTriviaStatistics(category.id);
+        const categoryToSend = categoryId === anyCategory.id ? undefined : categoryId;
+        await getNewTriviaStatistics(categoryToSend);
     }, [categories, getNewTriviaStatistics])
 
     return {

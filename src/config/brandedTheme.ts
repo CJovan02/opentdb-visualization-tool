@@ -1,12 +1,18 @@
 import {createTheme} from '@mui/material/styles';
 import type {ThemeOptions} from '@mui/material/styles';
-import {deepOrange} from '@mui/material/colors';
+import {indigo} from '@mui/material/colors';
+import {alpha} from '@mui/material/styles';
+
+const primaryColor = indigo[500];
 
 export const brandedTokens: ThemeOptions = {
     palette: {
         primary: {
-            main: deepOrange[500],
+            main: primaryColor,
         },
+        background: {
+            default: alpha(primaryColor, 0.05),
+        }
     },
     shape: {
         borderRadius: 4,
@@ -32,7 +38,15 @@ export const brandedComponents: ThemeOptions['components'] = {
                 //color: 'aqua'
             }
         }
-    }
+    },
+    MuiAppBar: {
+        styleOverrides: {
+            root: ({theme}) => ({
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+            }),
+        },
+    },
 };
 
 const brandedTheme = createTheme({

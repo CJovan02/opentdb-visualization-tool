@@ -3,15 +3,20 @@ import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import CategoryVisualizer from "./CategoryVisualizer.tsx";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
 import DifficultyVisualizer from "./DifficultyVisualizer.tsx";
+import CategorySelector from "./CategorySelector.tsx";
+import type {Category} from "../../models/category.ts";
 
 type TriviaVisualizationProps = {
     triviaStatistics: TriviaStatistics | undefined;
     distributionsLoading: boolean;
     getNewTriviaDistributions: () => void;
     selectLocalCategory: (category: string) => void;
-    localCategorySelected: boolean;
+    localCategorySelected: boolean | null;
+    categories: Category[];
+    selectedCategory: Category;
+    selectCategory: (categoryId: number) => void;
 }
 
 function TriviaVisualization({
@@ -20,9 +25,12 @@ function TriviaVisualization({
                                  getNewTriviaDistributions,
                                  selectLocalCategory,
                                  localCategorySelected,
+                                 categories,
+                                 selectedCategory,
+                                 selectCategory,
                              }: TriviaVisualizationProps) {
     return (
-        <Container>
+        <Container sx={{padding: '0'}}>
             <Stack
                 direction="column"
                 spacing={2}
@@ -30,26 +38,33 @@ function TriviaVisualization({
                 alignItems="center"
                 sx={{width: '100%'}}
             >
-                <Button variant="contained" onClick={() => getNewTriviaDistributions()}
-                        loading={distributionsLoading}>Reload
-                    new
-                    data</Button>
+                <Stack spacing={2} alignItems="center" direction={{xs: "column", sm: "row"}}>
+                    <CategorySelector
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        onSelectCategory={selectCategory}
+                    />
+                    <Button variant="contained" onClick={() => getNewTriviaDistributions()}
+                            loading={distributionsLoading}>Refresh Data</Button>
+                </Stack>
                 {/*{distributionsLoading && <CircularProgress/>}*/}
                 {!distributionsLoading && triviaStatistics && (
-                    <Grid container spacing={4} width="100%" sx={{alignItems: 'stretch', justifyContent: 'center'}}>
-                        <Grid size={{md: 6, sm: 12}}
-                              sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-                        >
-                            <CategoryVisualizer localCategorySelected={localCategorySelected}
+                    <Stack
+                        direction={{sm: 'column', md: 'row'}}
+                        //spacing={2}
+                        gap={2}
+                        sx={{width: '100%'}}
+                    >
+                        <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+                            <CategoryVisualizer categoryDistribution={triviaStatistics.distribution.byCategory}
                                                 selectLocalCategory={selectLocalCategory}
-                                                categoryDistribution={triviaStatistics.distribution.byCategory}/>
-                        </Grid>
-                        <Grid size={{md: 6, sm: 12}}
-                              sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-                        >
-                            <DifficultyVisualizer difficultyDistribution={triviaStatistics.distribution.byDifficulty}/>
-                        </Grid>
-                    </Grid>
+                                                localCategorySelected={localCategorySelected}/>
+                        </Box>
+                        <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+                            <DifficultyVisualizer difficultyDistribution={triviaStatistics.distribution.byDifficulty}
+                            />
+                        </Box>
+                    </Stack>
                 )}
             </Stack>
         </Container>
