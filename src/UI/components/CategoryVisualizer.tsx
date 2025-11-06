@@ -19,7 +19,8 @@ function CategoryVisualizer({
     const theme = useTheme();
 
     function onBarClickHandle(data: BarRectangleItem) {
-        selectLocalCategory(data.category)
+        const barData = data as unknown as { category: string };
+        selectLocalCategory(barData.category)
     }
 
     return (
