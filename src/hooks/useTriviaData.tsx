@@ -1,7 +1,12 @@
 import {useCallback, useEffect, useState} from "react";
-import {getTriviaCategories, getTriviaDistributions} from "../repository/triviaRepository.ts";
+import {
+    getTriviaCategories,
+    getTriviaDistributions,
+    groupQuestionsDistribution
+} from "../repository/triviaRepository.ts";
 import type {Category} from "../models/category.ts";
-import type {TriviaDistribution} from "../models/triviaDistribution.ts";
+import type {TriviaStatistics} from "../models/triviaStatistics.ts";
+import type {Question} from "../models/question.ts";
 
 // TODO error handling
 
@@ -10,7 +15,8 @@ export function useTriviaData() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [distributionsLoading, setDistributionsLoading] = useState(false);
-    const [triviaDist, setTriviaDist] = useState<TriviaDistribution | undefined>();
+    const [triviaStatistics, setTriviaStatistics] = useState<TriviaStatistics | undefined>();
+    const [localCategorySelected, setLocalCategorySelected] = useState<boolean>(false);
 
     const fetchCategories = async () => {
         setCategoriesLoading(true);
@@ -27,13 +33,38 @@ export function useTriviaData() {
     const getNewTriviaDistributions = useCallback(async () => {
         setDistributionsLoading(true);
         const dist = await getTriviaDistributions();
-        setTriviaDist(dist);
+        setTriviaStatistics(dist);
         setDistributionsLoading(false);
     }, [])
 
     useEffect(() => {
         fetchCategories();
     }, [])
+
+    const selectLocalCategory = useCallback((category: string) => {
+        if (triviaStatistics === undefined) return;
+
+        let newQuestions: Question[];
+
+        if (!localCategorySelected) {
+            setLocalCategorySelected(true);
+            newQuestions =
+                triviaStatistics.questions.filter((question) => question.category === category);
+        } else {
+            setLocalCategorySelected(false);
+            newQuestions = triviaStatistics.questions;
+        }
+
+        const [categoryDist, difficultyDist] = groupQuestionsDistribution(newQuestions);
+
+        setTriviaStatistics(prev => prev ? {
+            ...prev,
+            distribution: {
+                byCategory: categoryDist,
+                byDifficulty: difficultyDist,
+            },
+        } : prev);
+    }, [triviaStatistics, localCategorySelected]);
 
 
     function selectCategory(categoryId: number) {
@@ -51,7 +82,9 @@ export function useTriviaData() {
         selectedCategory,
         selectCategory,
         distributionsLoading,
-        triviaDist,
-        getNewTriviaDistributions
+        triviaStatistics,
+        getNewTriviaDistributions,
+        selectLocalCategory,
+        localCategorySelected,
     };
 }

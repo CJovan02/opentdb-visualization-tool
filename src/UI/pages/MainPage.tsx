@@ -14,7 +14,9 @@ function MainPage() {
         selectCategory,
         distributionsLoading,
         getNewTriviaDistributions,
-        triviaDist
+        triviaStatistics,
+        selectLocalCategory,
+        localCategorySelected,
     } = useTriviaData();
 
     if (categoriesLoading) {
@@ -32,7 +34,9 @@ function MainPage() {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-                <TriviaVisualization triviaDist={triviaDist} distributionsLoading={distributionsLoading}
+                <TriviaVisualization localCategorySelected={localCategorySelected}
+                                     selectLocalCategory={selectLocalCategory} triviaStatistics={triviaStatistics}
+                                     distributionsLoading={distributionsLoading}
                                      getNewTriviaDistributions={getNewTriviaDistributions}/>
 
                 <CategorySelector

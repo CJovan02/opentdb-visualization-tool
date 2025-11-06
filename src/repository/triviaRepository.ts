@@ -1,6 +1,7 @@
 import type {Category} from "../models/category.ts";
 import {fetchCategories, fetchQuestions} from "../api/triviaApi.ts";
-import type {CategoryDistribution, DifficultyDistribution, TriviaDistribution} from "../models/triviaDistribution.ts";
+import type {CategoryDistribution, DifficultyDistribution, TriviaStatistics} from "../models/triviaStatistics.ts";
+import type {Question} from "../models/question.ts";
 
 // TODO error handling
 
@@ -8,9 +9,19 @@ export async function getTriviaCategories(): Promise<Category[]> {
     return await fetchCategories();
 }
 
-export async function getTriviaDistributions(): Promise<TriviaDistribution> {
+export async function getTriviaDistributions(): Promise<TriviaStatistics> {
     const questions = await fetchQuestions();
 
+    const [categoryDist, difficultyDist] = groupQuestionsDistribution(questions);
+
+    return {
+        questions, distribution: {
+            byCategory: categoryDist, byDifficulty: difficultyDist
+        }
+    } as TriviaStatistics;
+}
+
+export function groupQuestionsDistribution(questions: Question[]): [CategoryDistribution[], DifficultyDistribution[]] {
     // We use record/map for quick lookup O(1) when counting questions for each category or difficulty
     const categoriesMap: Record<string, number> = {};
     const difficultyMap: Record<string, number> = {};
@@ -28,5 +39,5 @@ export async function getTriviaDistributions(): Promise<TriviaDistribution> {
         ([difficulty, questionCount]) => ({difficulty, questionCount})
     )
 
-    return {byCategory: categoryDist, byDifficulty: difficultyDist} as TriviaDistribution;
+    return [categoryDist, difficultyDist];
 }
