@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import DifficultyVisualizer from "./DifficultyVisualizer.tsx";
 import CategorySelector from "./CategorySelector.tsx";
 import type {Category} from "../../models/category.ts";
+import Refresh from "@mui/icons-material/Refresh";
 
 type TriviaVisualizationProps = {
     triviaStatistics: TriviaStatistics | undefined;
@@ -44,7 +45,7 @@ function TriviaVisualization({
                         selectedCategory={selectedCategory}
                         onSelectCategory={selectCategory}
                     />
-                    <Button variant="contained" onClick={() => getNewTriviaDistributions()}
+                    <Button startIcon={<Refresh/>} variant="contained" onClick={() => getNewTriviaDistributions()}
                             loading={distributionsLoading}>Refresh Data</Button>
                 </Stack>
                 {/*{distributionsLoading && <CircularProgress/>}*/}

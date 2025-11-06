@@ -27,24 +27,6 @@ function MainPage() {
         error
     } = useTriviaData();
 
-    if (triviaStatus === 'error') {
-        return (
-            <Container>
-                <ErrorDisplay message={getErrorMessage(error)} title="Error occurred"
-                              onRetry={() => getNewTriviaStatistics()}/>
-            </Container>
-        )
-    }
-
-    if (triviaStatus === 'loading' || triviaStatus === 'initial') {
-        return (
-            <Container>
-                <CircularProgress/>
-            </Container>
-
-        )
-    }
-
     return (
         <Box sx={{width: '100%', minHeight: '92vh'}}>
             <Snackbar
@@ -61,16 +43,32 @@ function MainPage() {
                 padding: '0',
             }}>
                 <MyAppBar/>
-                <TriviaVisualization categories={categories} selectedCategory={selectedCategory}
-                                     selectCategory={selectCategory} localCategorySelected={localCategorySelected}
-                                     selectLocalCategory={selectLocalCategory} triviaStatistics={triviaStatistics}
-                                     distributionsLoading={statisticsLoading}
-                                     getNewTriviaDistributions={getNewTriviaStatistics}/>
+
+                {triviaStatus === 'error' && (
+                    <ErrorDisplay message={getErrorMessage(error)} title="Error occurred"
+                                  onRetry={() => getNewTriviaStatistics()}/>
+                )}
+
+                {(triviaStatus === 'loading' || triviaStatus === 'initial') && (
+                    <CircularProgress/>
+                )}
+
+                {triviaStatus === 'loaded' && (
+                    <>
+                        <TriviaVisualization categories={categories} selectedCategory={selectedCategory}
+                                             selectCategory={selectCategory}
+                                             localCategorySelected={localCategorySelected}
+                                             selectLocalCategory={selectLocalCategory}
+                                             triviaStatistics={triviaStatistics}
+                                             distributionsLoading={statisticsLoading}
+                                             getNewTriviaDistributions={getNewTriviaStatistics}/>
 
 
-                <Typography mt='5rem'>
-                    Data Source: <Link href="https://opentdb.com/">Open Trivia DB</Link>
-                </Typography>
+                        <Typography mt='5rem'>
+                            Data Source: <Link href="https://opentdb.com/">Open Trivia DB</Link>
+                        </Typography>
+                    </>
+                )}
             </Container>
         </Box>
     );

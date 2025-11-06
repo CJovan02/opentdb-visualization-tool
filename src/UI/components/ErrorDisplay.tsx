@@ -1,5 +1,8 @@
-import {Alert, AlertTitle, Button, Stack} from "@mui/material";
-import RefreshIcon from "@mui/material/Icon";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Refresh from "@mui/icons-material/Refresh";
 
 type ErrorDisplayProps = {
     title?: string;
@@ -25,7 +28,7 @@ export function ErrorDisplay({title = "Something went wrong", message, onRetry}:
                 <Button
                     variant="contained"
                     color="error"
-                    startIcon={<RefreshIcon/>}
+                    startIcon={<Refresh />}
                     onClick={onRetry}
                 >
                     Retry
